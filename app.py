@@ -2,6 +2,9 @@ from flask import Flask, render_template
 from flaskext.mysql import MySQL
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'e10afc8bf64730d5b6c370c8c2c4fe35'
+
 mysql = MySQL()
 
 app.config['MYSQL_DATABASE_USER'] = 'saddique'
