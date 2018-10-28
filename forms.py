@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtfforms import StringField, PasswordField, SubmitField
-from wtfforms.validators import DataRequired, Length
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 class SignInForm(FlaskForm):
     fullname = StringField('Fullname', validators=[DataRequired()])
