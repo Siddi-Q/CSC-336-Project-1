@@ -12,11 +12,13 @@ app.config['MYSQL_DATABASE_USER'] = 'saddique'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'mydb'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+
 mysql.init_app(app)
+connect = mysql.connect()
 
 @app.route("/test")
 def testing():
-    cursor = mysql.connect().cursor()
+    cursor = connect.cursor()
     cursor.execute("SHOW TABLES")
     tables = cursor.fetchall()
     return render_template('test.html', tables = tables)
@@ -30,6 +32,12 @@ def signin():
     form = SignInForm()
     if form.validate_on_submit():
         flash(f'{form.fullname.data} has been signed in!', 'success')
+        cursor = connect.cursor()
+        cursor.execute(''' INSERT INTO patient_info VALUES (%s, %s, %s, %s, %s, %s)''',
+                (form.fullname.data, form.gender.data, form.date_of_birth.data,
+                form.address.data, form.phone_number.data, form.emergency_contact_number.data))
+        connect.commit()
+        #print(form.fullname.data)
         return redirect(url_for('hello'))
     return render_template('signin.html', form = form)
 
