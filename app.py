@@ -23,7 +23,7 @@ def testing():
 
 @app.route("/")
 def hello():
-    return "<h1>Home Page<h1>"
+    return render_template('home.html')
 
 @app.route("/signin", methods=['GET', 'POST'])
 def signin():
