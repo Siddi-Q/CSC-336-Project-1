@@ -37,7 +37,6 @@ def signin():
                 (form.fullname.data, form.gender.data, form.date_of_birth.data,
                 form.address.data, form.phone_number.data, form.emergency_contact_number.data))
         connect.commit()
-        #print(form.fullname.data)
         return redirect(url_for('hello'))
     return render_template('signin.html', form = form)
 
