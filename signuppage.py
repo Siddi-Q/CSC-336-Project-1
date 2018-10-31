@@ -66,9 +66,9 @@ class Toplevel1:
         e_contact_num = self.EmergencyContactNumberText.get('1.0', 'end-1c')
         gender = self.GenderText.get('1.0', 'end-1c')
 
-        insert_patient = "INSERT INTO patient (socialsecuritynumber, fullname, gender, dateofbirth, address, phonenumber, emergencycontactnumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        insert_patient = "INSERT INTO patient (SSN, fullName, gender, dateOfBirth, address, phoneNumber, emergencyContactNumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
         patient_info = (patient_ssn, patient_name, gender, dob, full_address, phone_number, e_contact_num)
-        insert_emergency_contact = "INSERT INTO emergencycontact (socialsecuritynumber, fullname, phonenumber) VALUES (%s,%s,%s)"
+        insert_emergency_contact = "INSERT INTO emergencycontact (SSN, fullName, phoneNumber) VALUES (%s,%s,%s)"
         emergency_contact_info = (patient_ssn, emergency_name, e_contact_num)
         try:
             self.my_cursor.execute(insert_patient, patient_info)
@@ -82,8 +82,8 @@ class Toplevel1:
         try:
             self.my_db = mysql.connector.connect(
                 host="localhost",
-                user="saddique", #root
-                password="password", #csc336
+                user="root",
+                password="csc336",
                 database="hospital")
 
             self.my_cursor = self.my_db.cursor()
