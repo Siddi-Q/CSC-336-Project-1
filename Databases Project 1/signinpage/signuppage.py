@@ -68,6 +68,7 @@ class Toplevel1:
             self.my_db.commit()
             self.my_cursor.execute(insert_emergency_contact, emergency_contact_info)
             self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully inserted patient info & emergency contact")
         except Exception:
             messagebox.showerror('Error', 'Error entering patient info: please double check patient information')
 

@@ -167,7 +167,7 @@ class Toplevel1:
             messagebox.showerror('Error', "Error submitting patient's diagnosis")
 
 
-    # Satesh
+
 
     def show_patient_info(self):
         try:
@@ -206,6 +206,7 @@ class Toplevel1:
             self.my_db.commit()
             self.my_cursor.execute(update_emergency_num_command)
             self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully updated patient info")
         except Exception:
             messagebox.showerror('Error changing',
                                  'Please make sure you have re-entered all of the patient. Also you cannot modify SSN!')
@@ -222,6 +223,7 @@ class Toplevel1:
         try:
             self.my_cursor.execute(insert_patient_record_command, patient_record_details)
             self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully inserted patient records")
         except Exception:
             messagebox.showerror('Error', 'Please make sure you\'ve entered all fields and a valid SSN')
 
@@ -255,6 +257,7 @@ class Toplevel1:
         try:
             self.my_cursor.execute(update_command)
             self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully updated patient records")
         except Exception:
             messagebox.showerror('Error!',
                                  'There was an error in updating patient records: Enter all fields and an existing SSN')
@@ -270,23 +273,28 @@ class Toplevel1:
         insert_surgery_command = "INSERT INTO patientsurgery (SSN, surgeryID, surgeryName, beginDate, endDate, results) " \
                                  "VALUES (%s, %s, %s, %s, %s, %s)"
         surgery_details = (patient_ssn, surgery_id, surgery_name, begin_date, end_date, results)
-
-        self.my_cursor.execute(insert_surgery_command, surgery_details)
-        self.my_db.commit()
+        try:
+            self.my_cursor.execute(insert_surgery_command, surgery_details)
+            self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully inserted patient surgery")
+        except Exception:
+            messagebox.showerror('Error', 'There was an error in entering patient surgery!')
 
     def show_surgery(self):
         patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
         show_command = f"SELECT s.SSN, fullName, surgeryID, surgeryName, beginDate," \
                        f" endDate, results FROM patient p JOIN patientsurgery s ON " \
                        f"p.SSN = '{patient_ssn}' AND s.SSN = '{patient_ssn}'"
-
-        self.my_cursor.execute(show_command)
-        list_surgeries = self.my_cursor.fetchall()
-        i = 0
-        self.Listbox2.delete(0, self.Listbox2.size())
-        for row in list_surgeries:
-            self.Listbox2.insert(i, row)
-            i = i + 1
+        try:
+            self.my_cursor.execute(show_command)
+            list_surgeries = self.my_cursor.fetchall()
+            i = 0
+            self.Listbox2.delete(0, self.Listbox2.size())
+            for row in list_surgeries:
+                self.Listbox2.insert(i, row)
+                i = i + 1
+        except Exception:
+            messagebox.showerror('Error', 'There was an error in showing surgery info!')
 
     def update_surgery(self):
         patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
@@ -302,9 +310,13 @@ class Toplevel1:
                          f"beginDate = '{begin_date}', " \
                          f"endDate = '{end_date}', " \
                          f"results = '{results}' WHERE SSN = '{patient_ssn}' AND beginDate = '{begin_date}'"
+        try:
+            self.my_cursor.execute(update_command)
+            self.my_db.commit()
+            messagebox.showinfo('Success', "You successfully updated surgery info")
+        except Exception:
+            messagebox.showerror('Error', 'There was an error in updating surgery!')
 
-        self.my_cursor.execute(update_command)
-        self.my_db.commit()
     def __init__(self, top=None):
         try:
             self.my_db = mysql.connector.connect(
