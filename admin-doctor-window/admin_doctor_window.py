@@ -6,6 +6,8 @@
 #    Oct 30, 2018 08:32:38 PM EDT  platform: Linux
 
 import sys
+import mysql.connector
+from tkinter import messagebox
 
 try:
     import Tkinter as tk
@@ -45,14 +47,137 @@ def destroy_Toplevel1():
     w = None
 
 class Toplevel1:
+
+    def show_contact_info(self):
+        try:
+            patient_ssn = self.emergency_contact_info_patientID_textbox.get('1.0', 'end-1c')
+            show_contact_info_command = f"SELECT p.SSN, p.fullName, ec.fullName, ec.phoneNumber " \
+                                        f"FROM patient p JOIN emergencycontact ec ON p.SSN = ec.SSN " \
+                                        f"AND ec.SSN = '{patient_ssn}' "
+            self.my_cursor.execute(show_contact_info_command)
+            list_contact_info = self.my_cursor.fetchall()
+            i = 0
+            self.emergency_contact_info_listbox.delete(0, self.emergency_contact_info_listbox.size())
+            for row in list_contact_info:
+                self.emergency_contact_info_listbox.insert(i, row)
+                i += 1
+        except:
+            messagebox.showerror('Error', "Error displaying patient's emergency contact info")
+
+    def show_diagnosis(self):
+        try:
+            show_contact_info_command = f"SELECT p.SSN, p.fullName, pd.diagnosisID, pd.diagnosisName, pd.dateOfDiagnosis " \
+                                        f"FROM patient p JOIN patientdiagnosis pd ON p.SSN = pd.SSN "
+            self.my_cursor.execute(show_contact_info_command)
+            list_diagnosis = self.my_cursor.fetchall()
+            i = 0
+            self.patient_diagnosis_listbox.delete(0, self.patient_diagnosis_listbox.size())
+            for row in list_diagnosis:
+                self.patient_diagnosis_listbox.insert(i, row)
+                i += 1
+        except:
+            messagebox.showerror('Error', "Error displaying patient's diagnosis")
+
+    def update_diagnosis(self):
+        patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
+        diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
+        diagnosis_Id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
+        diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
+
+        update_diagnosis_command = f"UPDATE patientdiagnosis SET" \
+                                f" diagnosisName = '{diagnosis_name}'," \
+                                f" dateOfDiagnosis = '{diagnosis_date}'" \
+                                f" WHERE SSN = '{patient_ssn}' AND diagnosisID = '{diagnosis_Id}'"
+
+        try:
+            self.my_cursor.execute(update_diagnosis_command)
+            self.my_db.commit()
+            messagebox.showinfo('Update Diagnosis Success', "You successfully updated a patient's diagnosis")
+        except:
+            messagebox.showerror('Error', "Error updating patient's diagnosis")
+
+    def submit_diagnosis(self):
+        patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
+        diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
+        diagnosis_Id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
+        diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
+
+        submit_diagnosis_command = f"INSERT INTO patientdiagnosis (SSN, diagnosisID, diagnosisName, dateOfDiagnosis) VALUES ('{patient_ssn}','{diagnosis_Id}','{diagnosis_name}','{diagnosis_date}')"
+        try:
+            self.my_cursor.execute(submit_diagnosis_command)
+            self.my_db.commit()
+            messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new diagnosis")
+        except:
+            messagebox.showerror('Error', "Error submitting patient's diagnosis")
+
+    def show_drug_treatment(self):
+        try:
+            #self.my_cursor.execute("SELECT * FROM patientdrugtreatment")
+            show_contact_info_command = f"SELECT p.SSN, p.fullName, pdt.diagnosisID, pdt.drugId, pdt.drugName " \
+                                        f"FROM patient p JOIN patientdrugtreatment pdt ON p.SSN = pdt.SSN "
+            self.my_cursor.execute(show_contact_info_command)
+            list_drug_treatment = self.my_cursor.fetchall()
+            i = 0
+            self.patient_drug_treatment_listbox.delete(0, self.patient_drug_treatment_listbox.size())
+            for row in list_drug_treatment:
+                self.patient_drug_treatment_listbox.insert(i, row)
+                i += 1
+        except:
+            messagebox.showerror('Error', "Error displaying patient's drug treatment")
+
+    def update_drug_treatment(self):
+        patient_ssn = self.patient_drug_treament_patientssn_textbox.get('1.0', 'end-1c')
+        diagnosis_Id = self.patient_drug_treatment_diagnosisID_textbox.get('1.0', 'end-1c')
+        drug_Id = self.patient_drug_treatment_drugID_textbox.get('1.0', 'end-1c')
+        drug_Name = self.patient_drug_treatment_drug_name_textbox.get('1.0', 'end-1c')
+
+        update_drug_treatment_command = f"UPDATE patientdrugtreatment SET" \
+                                f" drugName = '{drug_Name}'," \
+                                f" drugId = '{drug_Id}'" \
+                                f" WHERE SSN = '{patient_ssn}' AND diagnosisID = '{diagnosis_Id}'"
+
+        try:
+            self.my_cursor.execute(update_drug_treatment_command)
+            self.my_db.commit()
+            messagebox.showinfo('Update Drug Treatment Success', "You successfully updated a patient's drug treatment")
+        except:
+            messagebox.showerror('Error', "Error updating patient's diagnosis")
+
+    def submit_drug_treatment(self):
+        patient_ssn = self.patient_drug_treament_patientssn_textbox.get('1.0', 'end-1c')
+        diagnosis_Id = self.patient_drug_treatment_diagnosisID_textbox.get('1.0', 'end-1c')
+        drug_Id = self.patient_drug_treatment_drugID_textbox.get('1.0', 'end-1c')
+        drug_Name = self.patient_drug_treatment_drug_name_textbox.get('1.0', 'end-1c')
+
+        submit_drug_treatment_command = f"INSERT INTO patientdrugtreatment (SSN, diagnosisID, drugId, drugName) VALUES ('{patient_ssn}', '{diagnosis_Id}','{drug_Id}','{drug_Name}')"
+
+        try:
+            self.my_cursor.execute(submit_drug_treatment_command)
+            self.my_db.commit()
+            messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new drug treatment")
+        except:
+            messagebox.showerror('Error', "Error submitting patient's diagnosis")
+
     def __init__(self, top=None):
+        try:
+            self.my_db = mysql.connector.connect(
+            host="localhost",
+            user="saddique", #root
+            password="password", #csc336
+            database="hospital")
+
+            self.my_cursor = self.my_db.cursor()
+
+        except Exception:
+            messagebox.showerror('Error', 'Error while connecting to mysql database')
+
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85' 
-        _ana2color = '#d9d9d9' # X11 color: 'gray85' 
+        _ana1color = '#d9d9d9' # X11 color: 'gray85'
+        _ana2color = '#d9d9d9' # X11 color: 'gray85'
         font9 = "-family {DejaVu Sans} -size 7 -weight normal -slant "  \
             "italic -underline 0 -overstrike 0"
 
@@ -89,7 +214,7 @@ class Toplevel1:
         self.show_emergency_contact_info_button.place(relx=0.484, rely=0.135
                 , height=31, width=181, bordermode='ignore')
         self.show_emergency_contact_info_button.configure(activebackground="#d9d9d9")
-        self.show_emergency_contact_info_button.configure(text='''Show Contact Information''')
+        self.show_emergency_contact_info_button.configure(command=self.show_contact_info, text='''Show Contact Information''')
 
         self.emergency_contact_info_listbox = tk.Listbox(self.emergency_contact_labelframe)
         self.emergency_contact_info_listbox.place(relx=0.016, rely=0.432
@@ -171,19 +296,19 @@ class Toplevel1:
         self.patient_diagnosis_submit_button.place(relx=0.641, rely=0.408
                 , height=31, width=104, bordermode='ignore')
         self.patient_diagnosis_submit_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_submit_button.configure(text='''Submit''')
+        self.patient_diagnosis_submit_button.configure(command=self.submit_diagnosis, text='''Submit''')
 
         self.patient_diagnosis_update_button = tk.Button(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_update_button.place(relx=0.438, rely=0.408
                 , height=31, width=106, bordermode='ignore')
         self.patient_diagnosis_update_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_update_button.configure(text='''Update''')
+        self.patient_diagnosis_update_button.configure(command= self.update_diagnosis, text='''Update''')
 
         self.patient_diagnosis_show_diagnosis_button = tk.Button(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_show_diagnosis_button.place(relx=0.195, rely=0.408
                 , height=31, width=125, bordermode='ignore')
         self.patient_diagnosis_show_diagnosis_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_show_diagnosis_button.configure(text='''Show Diagnosis''')
+        self.patient_diagnosis_show_diagnosis_button.configure(command=self.show_diagnosis, text='''Show Diagnosis''')
 
         self.patient_diagnosis_listbox = tk.Listbox(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_listbox.place(relx=0.016, rely=0.571
@@ -353,19 +478,19 @@ class Toplevel1:
         self.patient_drug_treatment_submit_button.place(relx=0.656, rely=0.408
                 , height=29, width=102, bordermode='ignore')
         self.patient_drug_treatment_submit_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_submit_button.configure(text='''Submit''')
+        self.patient_drug_treatment_submit_button.configure(command= self.submit_drug_treatment, text='''Submit''')
 
         self.patient_drug_treatment_update_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_update_button.place(relx=0.453, rely=0.408
                 , height=29, width=103, bordermode='ignore')
         self.patient_drug_treatment_update_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_update_button.configure(text='''Update''')
+        self.patient_drug_treatment_update_button.configure(command=self.update_drug_treatment, text='''Update''')
 
         self.patient_drug_treatment_show_drug_treatments_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_show_drug_treatments_button.place(relx=0.141
                 , rely=0.408, height=29, width=175, bordermode='ignore')
         self.patient_drug_treatment_show_drug_treatments_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_show_drug_treatments_button.configure(text='''Show Drug Treatments''')
+        self.patient_drug_treatment_show_drug_treatments_button.configure(command=self.show_drug_treatment, text='''Show Drug Treatments''')
 
         self.patient_drug_treatment_listbox = tk.Listbox(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_listbox.place(relx=0.016, rely=0.571
@@ -709,8 +834,3 @@ class Toplevel1:
 
 if __name__ == '__main__':
     vp_start_gui()
-
-
-
-
-
