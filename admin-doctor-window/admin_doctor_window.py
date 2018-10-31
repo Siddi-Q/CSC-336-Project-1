@@ -16,35 +16,43 @@ except ImportError:
 
 try:
     import ttk
+
     py3 = False
 except ImportError:
     import tkinter.ttk as ttk
+
     py3 = True
 
 import admin_doctor_window_support
+
 
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
     root = tk.Tk()
-    top = Toplevel1 (root)
+    top = Toplevel1(root)
     admin_doctor_window_support.init(root, top)
     root.mainloop()
 
+
 w = None
+
+
 def create_Toplevel1(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
     global w, w_win, rt
     rt = root
-    w = tk.Toplevel (root)
-    top = Toplevel1 (w)
+    w = tk.Toplevel(root)
+    top = Toplevel1(w)
     admin_doctor_window_support.init(w, top, *args, **kwargs)
     return (w, top)
+
 
 def destroy_Toplevel1():
     global w
     w.destroy()
     w = None
+
 
 class Toplevel1:
 
@@ -61,7 +69,7 @@ class Toplevel1:
             for row in list_contact_info:
                 self.emergency_contact_info_listbox.insert(i, row)
                 i += 1
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error displaying patient's emergency contact info")
 
     def show_diagnosis(self):
@@ -75,7 +83,7 @@ class Toplevel1:
             for row in list_diagnosis:
                 self.patient_diagnosis_listbox.insert(i, row)
                 i += 1
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error displaying patient's diagnosis")
 
     def update_diagnosis(self):
@@ -93,7 +101,7 @@ class Toplevel1:
             self.my_cursor.execute(update_diagnosis_command)
             self.my_db.commit()
             messagebox.showinfo('Update Diagnosis Success', "You successfully updated a patient's diagnosis")
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error updating patient's diagnosis")
 
     def submit_diagnosis(self):
@@ -107,7 +115,7 @@ class Toplevel1:
             self.my_cursor.execute(submit_diagnosis_command)
             self.my_db.commit()
             messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new diagnosis")
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error submitting patient's diagnosis")
 
     def show_drug_treatment(self):
@@ -122,7 +130,7 @@ class Toplevel1:
             for row in list_drug_treatment:
                 self.patient_drug_treatment_listbox.insert(i, row)
                 i += 1
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error displaying patient's drug treatment")
 
     def update_drug_treatment(self):
@@ -140,7 +148,7 @@ class Toplevel1:
             self.my_cursor.execute(update_drug_treatment_command)
             self.my_db.commit()
             messagebox.showinfo('Update Drug Treatment Success', "You successfully updated a patient's drug treatment")
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error updating patient's diagnosis")
 
     def submit_drug_treatment(self):
@@ -155,16 +163,155 @@ class Toplevel1:
             self.my_cursor.execute(submit_drug_treatment_command)
             self.my_db.commit()
             messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new drug treatment")
-        except:
+        except Exception:
             messagebox.showerror('Error', "Error submitting patient's diagnosis")
 
+
+   
+
+    def show_patient_info(self):
+        try:
+
+            self.my_cursor.execute("SELECT * FROM patient;")
+            list_patients = self.my_cursor.fetchall()
+            i = 0
+            self.Listbox3.delete(0, self.Listbox3.size())
+            for row in list_patients:
+                self.Listbox3.insert(i, row)
+                i = i + 1
+        except Exception:
+            messagebox.showerror('Error', 'Error displaying patient info')
+
+    def update_patient_info(self):
+        patient_ssn = self.patient_information_patientssn_textbox.get('1.0', 'end-1c')
+        patient_name = self.patient_info_fullname_textbox.get('1.0', 'end-1c')
+        patient_gender = self.patient_info_gender_textbox.get('1.0', 'end-1c')
+        patient_dob = self.patient_info_DOB_textbox.get('1.0', 'end-1c')
+        patient_address = self.patient_info_address_textbox.get('1.0', 'end-1c')
+        patient_phone = self.Text5.get('1.0', 'end-1c')
+        patient_enumber = self.patient_info_emergency_contact_phone_textbox.get('1.0', 'end-1c')
+
+        update_patient_command = f"UPDATE patient SET" \
+                                 f" fullName = '{patient_name}'," \
+                                 f" gender = '{patient_gender}'," \
+                                 f" dateOfBirth = '{patient_dob}'," \
+                                 f" address = '{patient_address}'," \
+                                 f" phoneNumber = '{patient_phone}'," \
+                                 f" emergencyContactNumber = '{patient_enumber}'" \
+                                 f" WHERE SSN = '{patient_ssn}' "
+
+        update_emergency_num_command = f"UPDATE emergencycontact SET phoneNumber = '{patient_enumber}' WHERE SSN = '{patient_ssn}' "
+        try:
+            self.my_cursor.execute(update_patient_command)
+            self.my_db.commit()
+            self.my_cursor.execute(update_emergency_num_command)
+            self.my_db.commit()
+        except Exception:
+            messagebox.showerror('Error changing',
+                                 'Please make sure you have re-entered all of the patient. Also you cannot modify SSN!')
+
+    def insert_patient_records(self):
+        patient_ssn = self.patient_records_patientID_textbox.get('1.0', 'end-1c')
+        patient_admission = self.patient_records_admission_date_textbox.get('1.0', 'end-1c')
+        patient_release = self.patient_records_discharge_date_textbox.get('1.0', 'end-1c')
+        patient_fees = self.patient_records_fee_textbox.get('1.0', 'end-1c')
+
+        insert_patient_record_command = "INSERT INTO patientrecord (SSN, admissionDate, releaseDate, fees)" \
+                                        " VALUES (%s,%s,%s,%s)"
+        patient_record_details = (patient_ssn, patient_admission, patient_release, patient_fees)
+        try:
+            self.my_cursor.execute(insert_patient_record_command, patient_record_details)
+            self.my_db.commit()
+        except Exception:
+            messagebox.showerror('Error', 'Please make sure you\'ve entered all fields and a valid SSN')
+
+    def show_patient_records(self):
+        patient_ssn = self.patient_records_patientID_textbox.get('1.0', 'end-1c')
+        show_patient_record_command = f"SELECT pr.SSN, fullName, admissionDate," \
+                                      f"releaseDate, fees from patient p JOIN" \
+                                      f" patientrecord pr ON pr.SSN = p.SSN AND " \
+                                      f"pr.SSN = '{patient_ssn}'"
+        try:
+            self.my_cursor.execute(show_patient_record_command)
+            list_patient_records = self.my_cursor.fetchall()
+            i = 0
+            self.patient_records_listbox.delete(0, self.patient_records_listbox.size())
+            for row in list_patient_records:
+                self.patient_records_listbox.insert(i, row)
+                i = i + 1
+        except Exception:
+            messagebox.showerror('Error!', 'There was an error in showing patient records')
+
+    def update_patient_records(self):
+        patient_ssn = self.patient_records_patientID_textbox.get('1.0', 'end-1c')
+        patient_admission = self.patient_records_admission_date_textbox.get('1.0', 'end-1c')
+        patient_release = self.patient_records_discharge_date_textbox.get('1.0', 'end-1c')
+        patient_fees = self.patient_records_fee_textbox.get('1.0', 'end-1c')
+
+        update_command = f"UPDATE patientrecord SET" \
+                         f" admissionDate = {patient_admission}, " \
+                         f"releaseDate = {patient_release}," \
+                         f" fees = {patient_fees} WHERE SSN = {patient_ssn} AND admissionDate = {patient_admission}"
+        try:
+            self.my_cursor.execute(update_command)
+            self.my_db.commit()
+        except Exception:
+            messagebox.showerror('Error!',
+                                 'There was an error in updating patient records: Enter all fields and an existing SSN')
+
+    def insert_patient_surgery(self):
+        patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
+        surgery_id = self.patient_surgeries_surgeryID_textbox.get('1.0', 'end-1c')
+        surgery_name = self.patient_surgeries_surgery_name_textbox.get('1.0', 'end-1c')
+        begin_date = self.patient_surgeries_start_date_textbox.get('1.0', 'end-1c')
+        end_date = self.patient_surgeries_end_date_textbox.get('1.0', 'end-1c')
+        results = self.patient_surgeries_result_textbox.get('1.0', 'end-1c')
+
+        insert_surgery_command = "INSERT INTO patientsurgery (SSN, surgeryID, surgeryName, beginDate, endDate, results) " \
+                                 "VALUES (%s, %s, %s, %s, %s, %s)"
+        surgery_details = (patient_ssn, surgery_id, surgery_name, begin_date, end_date, results)
+
+        self.my_cursor.execute(insert_surgery_command, surgery_details)
+        self.my_db.commit()
+
+    def show_surgery(self):
+        patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
+        show_command = f"SELECT s.SSN, fullName, surgeryID, surgeryName, beginDate," \
+                       f" endDate, results FROM patient p JOIN patientsurgery s ON " \
+                       f"p.SSN = '{patient_ssn}' AND s.SSN = '{patient_ssn}'"
+
+        self.my_cursor.execute(show_command)
+        list_surgeries = self.my_cursor.fetchall()
+        i = 0
+        self.Listbox2.delete(0, self.Listbox2.size())
+        for row in list_surgeries:
+            self.Listbox2.insert(i, row)
+            i = i + 1
+
+    def update_surgery(self):
+        patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
+        surgery_id = self.patient_surgeries_surgeryID_textbox.get('1.0', 'end-1c')
+        surgery_name = self.patient_surgeries_surgery_name_textbox.get('1.0', 'end-1c')
+        begin_date = self.patient_surgeries_start_date_textbox.get('1.0', 'end-1c')
+        end_date = self.patient_surgeries_end_date_textbox.get('1.0', 'end-1c')
+        results = self.patient_surgeries_result_textbox.get('1.0', 'end-1c')
+
+        update_command = f"UPDATE patientsurgery SET " \
+                         f"surgeryID = '{surgery_id}', " \
+                         f"surgeryName = '{surgery_name}', " \
+                         f"beginDate = '{begin_date}', " \
+                         f"endDate = '{end_date}', " \
+                         f"results = '{results}' WHERE SSN = '{patient_ssn}' AND beginDate = '{begin_date}'"
+
+        self.my_cursor.execute(update_command)
+        self.my_db.commit()
     def __init__(self, top=None):
         try:
             self.my_db = mysql.connector.connect(
-            host="localhost",
-            user="saddique", #root
-            password="password", #csc336
-            database="hospital")
+                host="localhost",
+                user="root",
+                password="csc336",
+                database="hospital")
 
             self.my_cursor = self.my_db.cursor()
 
@@ -175,11 +322,11 @@ class Toplevel1:
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#d9d9d9' # X11 color: 'gray85'
-        font9 = "-family {DejaVu Sans} -size 7 -weight normal -slant "  \
-            "italic -underline 0 -overstrike 0"
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#d9d9d9'  # X11 color: 'gray85'
+        font9 = "-family {DejaVu Sans} -size 7 -weight normal -slant " \
+                "italic -underline 0 -overstrike 0"
 
         top.geometry("1373x729+67+27")
         top.title("New Toplevel")
@@ -188,7 +335,7 @@ class Toplevel1:
 
         self.emergency_contact_labelframe = tk.LabelFrame(top)
         self.emergency_contact_labelframe.place(relx=0.503, rely=0.027
-                , relheight=0.254, relwidth=0.466)
+                                                , relheight=0.254, relwidth=0.466)
         self.emergency_contact_labelframe.configure(relief='groove')
         self.emergency_contact_labelframe.configure(text='''Emergency Contact Information''')
         self.emergency_contact_labelframe.configure(background="#d8d8d8")
@@ -196,14 +343,14 @@ class Toplevel1:
 
         self.emergency_contact_info_patient_ssn_label = tk.Label(self.emergency_contact_labelframe)
         self.emergency_contact_info_patient_ssn_label.place(relx=0.063
-                , rely=0.162, height=21, width=80, bordermode='ignore')
+                                                            , rely=0.162, height=21, width=80, bordermode='ignore')
         self.emergency_contact_info_patient_ssn_label.configure(activebackground="#f9f9f9")
         self.emergency_contact_info_patient_ssn_label.configure(text='''Patient SSN''')
 
         self.emergency_contact_info_patientID_textbox = tk.Text(self.emergency_contact_labelframe)
         self.emergency_contact_info_patientID_textbox.place(relx=0.203
-                , rely=0.162, relheight=0.13, relwidth=0.166
-                , bordermode='ignore')
+                                                            , rely=0.162, relheight=0.13, relwidth=0.166
+                                                            , bordermode='ignore')
         self.emergency_contact_info_patientID_textbox.configure(background="white")
         self.emergency_contact_info_patientID_textbox.configure(font="TkTextFont")
         self.emergency_contact_info_patientID_textbox.configure(selectbackground="#c4c4c4")
@@ -212,13 +359,14 @@ class Toplevel1:
 
         self.show_emergency_contact_info_button = tk.Button(self.emergency_contact_labelframe)
         self.show_emergency_contact_info_button.place(relx=0.484, rely=0.135
-                , height=31, width=181, bordermode='ignore')
+                                                      , height=31, width=181, bordermode='ignore')
         self.show_emergency_contact_info_button.configure(activebackground="#d9d9d9")
-        self.show_emergency_contact_info_button.configure(command=self.show_contact_info, text='''Show Contact Information''')
+        self.show_emergency_contact_info_button.configure(text='''Show Contact Information''')
+        self.show_emergency_contact_info_button.configure(command=self.show_contact_info)
 
         self.emergency_contact_info_listbox = tk.Listbox(self.emergency_contact_labelframe)
         self.emergency_contact_info_listbox.place(relx=0.016, rely=0.432
-                , relheight=0.465, relwidth=0.959, bordermode='ignore')
+                                                  , relheight=0.465, relwidth=0.959, bordermode='ignore')
         self.emergency_contact_info_listbox.configure(background="white")
         self.emergency_contact_info_listbox.configure(font="TkFixedFont")
         self.emergency_contact_info_listbox.configure(selectbackground="#c4c4c4")
@@ -226,20 +374,20 @@ class Toplevel1:
 
         self.patient_diagnosis_labelframe = tk.LabelFrame(top)
         self.patient_diagnosis_labelframe.place(relx=0.503, rely=0.288
-                , relheight=0.336, relwidth=0.466)
+                                                , relheight=0.336, relwidth=0.466)
         self.patient_diagnosis_labelframe.configure(relief='groove')
         self.patient_diagnosis_labelframe.configure(text='''Patient Diagnosis''')
         self.patient_diagnosis_labelframe.configure(width=640)
 
         self.patient_diagnosis_patientssn_label = tk.Label(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_patientssn_label.place(relx=0.063, rely=0.122
-                , height=21, width=88, bordermode='ignore')
+                                                      , height=21, width=88, bordermode='ignore')
         self.patient_diagnosis_patientssn_label.configure(activebackground="#f9f9f9")
         self.patient_diagnosis_patientssn_label.configure(text='''Patient SSN''')
 
         self.patient_diagnosis_patientID_textbox = tk.Text(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_patientID_textbox.place(relx=0.203, rely=0.122
-                , relheight=0.098, relwidth=0.166, bordermode='ignore')
+                                                       , relheight=0.098, relwidth=0.166, bordermode='ignore')
         self.patient_diagnosis_patientID_textbox.configure(background="white")
         self.patient_diagnosis_patientID_textbox.configure(font="TkTextFont")
         self.patient_diagnosis_patientID_textbox.configure(selectbackground="#c4c4c4")
@@ -248,25 +396,25 @@ class Toplevel1:
 
         self.patient_diagnosis_diagnosis_name_label = tk.Label(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosis_name_label.place(relx=0.063, rely=0.286
-                , height=21, width=111, bordermode='ignore')
+                                                          , height=21, width=111, bordermode='ignore')
         self.patient_diagnosis_diagnosis_name_label.configure(activebackground="#f9f9f9")
         self.patient_diagnosis_diagnosis_name_label.configure(text='''Diagnosis Name''')
 
         self.patient_diagnosis_diagnosisID_label = tk.Label(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosisID_label.place(relx=0.516, rely=0.122
-                , height=21, width=86, bordermode='ignore')
+                                                       , height=21, width=86, bordermode='ignore')
         self.patient_diagnosis_diagnosisID_label.configure(activebackground="#f9f9f9")
         self.patient_diagnosis_diagnosisID_label.configure(text='''Diagnosis ID''')
 
         self.patient_diagnosis_diagnosis_date = tk.Label(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosis_date.place(relx=0.516, rely=0.286
-                , height=21, width=103, bordermode='ignore')
+                                                    , height=21, width=103, bordermode='ignore')
         self.patient_diagnosis_diagnosis_date.configure(activebackground="#f9f9f9")
         self.patient_diagnosis_diagnosis_date.configure(text='''Diagnosis Date''')
 
         self.patient_diagnosis_diagnosis_name_textbox = tk.Text(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosis_name_textbox.place(relx=0.25, rely=0.286
-                , relheight=0.098, relwidth=0.15, bordermode='ignore')
+                                                            , relheight=0.098, relwidth=0.15, bordermode='ignore')
         self.patient_diagnosis_diagnosis_name_textbox.configure(background="white")
         self.patient_diagnosis_diagnosis_name_textbox.configure(font="TkTextFont")
         self.patient_diagnosis_diagnosis_name_textbox.configure(selectbackground="#c4c4c4")
@@ -275,7 +423,7 @@ class Toplevel1:
 
         self.patient_diagnosis_diagnosisID_textbox = tk.Text(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosisID_textbox.place(relx=0.672, rely=0.122
-                , relheight=0.098, relwidth=0.119, bordermode='ignore')
+                                                         , relheight=0.098, relwidth=0.119, bordermode='ignore')
         self.patient_diagnosis_diagnosisID_textbox.configure(background="white")
         self.patient_diagnosis_diagnosisID_textbox.configure(font="TkTextFont")
         self.patient_diagnosis_diagnosisID_textbox.configure(selectbackground="#c4c4c4")
@@ -284,8 +432,8 @@ class Toplevel1:
 
         self.patient_diagnosis_diagnosis_date_textbox = tk.Text(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_diagnosis_date_textbox.place(relx=0.688
-                , rely=0.286, relheight=0.098, relwidth=0.134
-                , bordermode='ignore')
+                                                            , rely=0.286, relheight=0.098, relwidth=0.134
+                                                            , bordermode='ignore')
         self.patient_diagnosis_diagnosis_date_textbox.configure(background="white")
         self.patient_diagnosis_diagnosis_date_textbox.configure(font="TkTextFont")
         self.patient_diagnosis_diagnosis_date_textbox.configure(selectbackground="#c4c4c4")
@@ -294,25 +442,28 @@ class Toplevel1:
 
         self.patient_diagnosis_submit_button = tk.Button(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_submit_button.place(relx=0.641, rely=0.408
-                , height=31, width=104, bordermode='ignore')
+                                                   , height=31, width=104, bordermode='ignore')
         self.patient_diagnosis_submit_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_submit_button.configure(command=self.submit_diagnosis, text='''Submit''')
+        self.patient_diagnosis_submit_button.configure(text='''Submit''')
+        self.patient_diagnosis_submit_button.configure(command=self.submit_diagnosis)
 
         self.patient_diagnosis_update_button = tk.Button(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_update_button.place(relx=0.438, rely=0.408
-                , height=31, width=106, bordermode='ignore')
+                                                   , height=31, width=106, bordermode='ignore')
         self.patient_diagnosis_update_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_update_button.configure(command= self.update_diagnosis, text='''Update''')
+        self.patient_diagnosis_update_button.configure(text='''Update''')
+        self.patient_diagnosis_update_button.configure(command=self.update_diagnosis)
 
         self.patient_diagnosis_show_diagnosis_button = tk.Button(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_show_diagnosis_button.place(relx=0.195, rely=0.408
-                , height=31, width=125, bordermode='ignore')
+                                                           , height=31, width=125, bordermode='ignore')
         self.patient_diagnosis_show_diagnosis_button.configure(activebackground="#d9d9d9")
-        self.patient_diagnosis_show_diagnosis_button.configure(command=self.show_diagnosis, text='''Show Diagnosis''')
+        self.patient_diagnosis_show_diagnosis_button.configure(text='''Show Diagnosis''')
+        self.patient_diagnosis_show_diagnosis_button.configure(command=self.show_diagnosis)
 
         self.patient_diagnosis_listbox = tk.Listbox(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_listbox.place(relx=0.016, rely=0.571
-                , relheight=0.351, relwidth=0.959, bordermode='ignore')
+                                             , relheight=0.351, relwidth=0.959, bordermode='ignore')
         self.patient_diagnosis_listbox.configure(background="white")
         self.patient_diagnosis_listbox.configure(font="TkFixedFont")
         self.patient_diagnosis_listbox.configure(selectbackground="#c4c4c4")
@@ -320,27 +471,27 @@ class Toplevel1:
 
         self.patient_diagnosis_yyyymmdd_label = tk.Label(self.patient_diagnosis_labelframe)
         self.patient_diagnosis_yyyymmdd_label.place(relx=0.703, rely=0.245
-                , height=11, width=56, bordermode='ignore')
+                                                    , height=11, width=56, bordermode='ignore')
         self.patient_diagnosis_yyyymmdd_label.configure(activebackground="#f9f9f9")
         self.patient_diagnosis_yyyymmdd_label.configure(font=font9)
         self.patient_diagnosis_yyyymmdd_label.configure(text='''YYYYMMDD''')
 
         self.patient_records_labelframe = tk.LabelFrame(top)
         self.patient_records_labelframe.place(relx=0.015, rely=0.288
-                , relheight=0.336, relwidth=0.466)
+                                              , relheight=0.336, relwidth=0.466)
         self.patient_records_labelframe.configure(relief='groove')
         self.patient_records_labelframe.configure(text='''Patient Records''')
         self.patient_records_labelframe.configure(width=640)
 
         self.patient_records_patientssn_label = tk.Label(self.patient_records_labelframe)
         self.patient_records_patientssn_label.place(relx=0.063, rely=0.122
-                , height=21, width=80, bordermode='ignore')
+                                                    , height=21, width=80, bordermode='ignore')
         self.patient_records_patientssn_label.configure(activebackground="#f9f9f9")
         self.patient_records_patientssn_label.configure(text='''Patient SSN''')
 
         self.patient_records_patientID_textbox = tk.Text(self.patient_records_labelframe)
         self.patient_records_patientID_textbox.place(relx=0.203, rely=0.122
-                , relheight=0.098, relwidth=0.166, bordermode='ignore')
+                                                     , relheight=0.098, relwidth=0.166, bordermode='ignore')
         self.patient_records_patientID_textbox.configure(background="white")
         self.patient_records_patientID_textbox.configure(font="TkTextFont")
         self.patient_records_patientID_textbox.configure(selectbackground="#c4c4c4")
@@ -349,13 +500,13 @@ class Toplevel1:
 
         self.patient_records_admission_date_label = tk.Label(self.patient_records_labelframe)
         self.patient_records_admission_date_label.place(relx=0.063, rely=0.286
-                , height=21, width=107, bordermode='ignore')
+                                                        , height=21, width=107, bordermode='ignore')
         self.patient_records_admission_date_label.configure(activebackground="#f9f9f9")
         self.patient_records_admission_date_label.configure(text='''Admission Date''')
 
         self.patient_records_admission_date_textbox = tk.Text(self.patient_records_labelframe)
         self.patient_records_admission_date_textbox.place(relx=0.25, rely=0.286
-                , relheight=0.098, relwidth=0.134, bordermode='ignore')
+                                                          , relheight=0.098, relwidth=0.134, bordermode='ignore')
         self.patient_records_admission_date_textbox.configure(background="white")
         self.patient_records_admission_date_textbox.configure(font="TkTextFont")
         self.patient_records_admission_date_textbox.configure(selectbackground="#c4c4c4")
@@ -364,20 +515,20 @@ class Toplevel1:
 
         self.patient_records_discharge_date_label = tk.Label(self.patient_records_labelframe)
         self.patient_records_discharge_date_label.place(relx=0.453, rely=0.286
-                , height=21, width=104, bordermode='ignore')
+                                                        , height=21, width=104, bordermode='ignore')
         self.patient_records_discharge_date_label.configure(activebackground="#f9f9f9")
         self.patient_records_discharge_date_label.configure(text='''Discharge Date''')
 
         self.patient_records_yyyymmdd_label1 = tk.Label(self.patient_records_labelframe)
         self.patient_records_yyyymmdd_label1.place(relx=0.266, rely=0.245
-                , height=11, width=61, bordermode='ignore')
+                                                   , height=11, width=61, bordermode='ignore')
         self.patient_records_yyyymmdd_label1.configure(activebackground="#f9f9f9")
         self.patient_records_yyyymmdd_label1.configure(font=font9)
         self.patient_records_yyyymmdd_label1.configure(text='''YYYYMMDD''')
 
         self.patient_records_discharge_date_textbox = tk.Text(self.patient_records_labelframe)
         self.patient_records_discharge_date_textbox.place(relx=0.641, rely=0.286
-                , relheight=0.098, relwidth=0.134, bordermode='ignore')
+                                                          , relheight=0.098, relwidth=0.134, bordermode='ignore')
         self.patient_records_discharge_date_textbox.configure(background="white")
         self.patient_records_discharge_date_textbox.configure(font="TkTextFont")
         self.patient_records_discharge_date_textbox.configure(selectbackground="#c4c4c4")
@@ -386,20 +537,20 @@ class Toplevel1:
 
         self.patient_records_yyyymmdd_label2 = tk.Label(self.patient_records_labelframe)
         self.patient_records_yyyymmdd_label2.place(relx=0.656, rely=0.245
-                , height=11, width=56, bordermode='ignore')
+                                                   , height=11, width=56, bordermode='ignore')
         self.patient_records_yyyymmdd_label2.configure(activebackground="#f9f9f9")
         self.patient_records_yyyymmdd_label2.configure(font=font9)
         self.patient_records_yyyymmdd_label2.configure(text='''YYYYMMDD''')
 
         self.patient_records_fee_label = tk.Label(self.patient_records_labelframe)
         self.patient_records_fee_label.place(relx=0.547, rely=0.122, height=21
-                , width=28, bordermode='ignore')
+                                             , width=28, bordermode='ignore')
         self.patient_records_fee_label.configure(activebackground="#f9f9f9")
         self.patient_records_fee_label.configure(text='''Fee''')
 
         self.patient_records_fee_textbox = tk.Text(self.patient_records_labelframe)
         self.patient_records_fee_textbox.place(relx=0.641, rely=0.122
-                , relheight=0.098, relwidth=0.119, bordermode='ignore')
+                                               , relheight=0.098, relwidth=0.119, bordermode='ignore')
         self.patient_records_fee_textbox.configure(background="white")
         self.patient_records_fee_textbox.configure(font="TkTextFont")
         self.patient_records_fee_textbox.configure(selectbackground="#c4c4c4")
@@ -408,31 +559,34 @@ class Toplevel1:
 
         self.patient_records_dollar_sign_label = tk.Label(self.patient_records_labelframe)
         self.patient_records_dollar_sign_label.place(relx=0.625, rely=0.122
-                , height=23, width=10, bordermode='ignore')
+                                                     , height=23, width=10, bordermode='ignore')
         self.patient_records_dollar_sign_label.configure(activebackground="#f9f9f9")
         self.patient_records_dollar_sign_label.configure(text='''$''')
 
         self.patient_records_submit_button = tk.Button(self.patient_records_labelframe)
         self.patient_records_submit_button.place(relx=0.656, rely=0.408
-                , height=30, width=118, bordermode='ignore')
+                                                 , height=30, width=118, bordermode='ignore')
         self.patient_records_submit_button.configure(activebackground="#d9d9d9")
         self.patient_records_submit_button.configure(text='''Submit''')
+        self.patient_records_submit_button.configure(command=self.insert_patient_records)
 
         self.patient_records_update_button = tk.Button(self.patient_records_labelframe)
         self.patient_records_update_button.place(relx=0.422, rely=0.408
-                , height=31, width=118, bordermode='ignore')
+                                                 , height=31, width=118, bordermode='ignore')
         self.patient_records_update_button.configure(activebackground="#d9d9d9")
         self.patient_records_update_button.configure(text='''Update''')
+        self.patient_records_update_button.configure(command=self.update_patient_records)
 
         self.patient_records_show_records_button = tk.Button(self.patient_records_labelframe)
         self.patient_records_show_records_button.place(relx=0.203, rely=0.408
-                , height=31, width=109, bordermode='ignore')
+                                                       , height=31, width=109, bordermode='ignore')
         self.patient_records_show_records_button.configure(activebackground="#d9d9d9")
         self.patient_records_show_records_button.configure(text='''Show Records''')
+        self.patient_records_show_records_button.configure(command=self.show_patient_records)
 
         self.patient_records_listbox = tk.Listbox(self.patient_records_labelframe)
         self.patient_records_listbox.place(relx=0.016, rely=0.571
-                , relheight=0.351, relwidth=0.959, bordermode='ignore')
+                                           , relheight=0.351, relwidth=0.959, bordermode='ignore')
         self.patient_records_listbox.configure(background="white")
         self.patient_records_listbox.configure(font="TkFixedFont")
         self.patient_records_listbox.configure(selectbackground="#c4c4c4")
@@ -440,61 +594,65 @@ class Toplevel1:
 
         self.patient_drug_treatment_labelframe = tk.LabelFrame(top)
         self.patient_drug_treatment_labelframe.place(relx=0.503, rely=0.631
-                , relheight=0.336, relwidth=0.466)
+                                                     , relheight=0.336, relwidth=0.466)
         self.patient_drug_treatment_labelframe.configure(relief='groove')
         self.patient_drug_treatment_labelframe.configure(text='''Patient Drug Treatment''')
         self.patient_drug_treatment_labelframe.configure(width=640)
 
         self.patient_drug_treatment_patientID_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_patientID_label.place(relx=0.078, rely=0.163
-                , height=21, width=4, bordermode='ignore')
+                                                          , height=21, width=4, bordermode='ignore')
         self.patient_drug_treatment_patientID_label.configure(activebackground="#f9f9f9")
 
         self.patient_drug_treatment_patientssn_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_patientssn_label.place(relx=0.078, rely=0.122
-                , height=21, width=80, bordermode='ignore')
+                                                           , height=21, width=80, bordermode='ignore')
         self.patient_drug_treatment_patientssn_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_patientssn_label.configure(text='''Patient SSN''')
 
         self.patient_drug_treatment_drug_name_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_drug_name_label.place(relx=0.5, rely=0.122
-                , height=21, width=78, bordermode='ignore')
+                                                          , height=21, width=78, bordermode='ignore')
         self.patient_drug_treatment_drug_name_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_drug_name_label.configure(text='''Drug Name''')
 
         self.patient_drug_treatment_drugID_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_drugID_label.place(relx=0.531, rely=0.286
-                , height=21, width=63, bordermode='ignore')
+                                                       , height=21, width=63, bordermode='ignore')
         self.patient_drug_treatment_drugID_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_drugID_label.configure(text='''Drug ID''')
 
         self.patient_drug_treatment_diagnosisID_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_diagnosisID_label.place(relx=0.078
-                , rely=0.286, height=21, width=86, bordermode='ignore')
+                                                            , rely=0.286, height=21, width=86, bordermode='ignore')
         self.patient_drug_treatment_diagnosisID_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_diagnosisID_label.configure(text='''Diagnosis ID''')
 
         self.patient_drug_treatment_submit_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_submit_button.place(relx=0.656, rely=0.408
-                , height=29, width=102, bordermode='ignore')
+                                                        , height=29, width=102, bordermode='ignore')
         self.patient_drug_treatment_submit_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_submit_button.configure(command= self.submit_drug_treatment, text='''Submit''')
+        self.patient_drug_treatment_submit_button.configure(text='''Submit''')
+        self.patient_drug_treatment_submit_button.configure(command=self.submit_drug_treatment)
 
         self.patient_drug_treatment_update_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_update_button.place(relx=0.453, rely=0.408
-                , height=29, width=103, bordermode='ignore')
+                                                        , height=29, width=103, bordermode='ignore')
         self.patient_drug_treatment_update_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_update_button.configure(command=self.update_drug_treatment, text='''Update''')
+        self.patient_drug_treatment_update_button.configure(text='''Update''')
+        self.patient_drug_treatment_update_button.configure(command=self.update_drug_treatment)
 
         self.patient_drug_treatment_show_drug_treatments_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_show_drug_treatments_button.place(relx=0.141
-                , rely=0.408, height=29, width=175, bordermode='ignore')
+                                                                      , rely=0.408, height=29, width=175,
+                                                                      bordermode='ignore')
         self.patient_drug_treatment_show_drug_treatments_button.configure(activebackground="#d9d9d9")
-        self.patient_drug_treatment_show_drug_treatments_button.configure(command=self.show_drug_treatment, text='''Show Drug Treatments''')
+        self.patient_drug_treatment_show_drug_treatments_button.configure(text='''Show Drug Treatments''')
+        self.patient_drug_treatment_show_drug_treatments_button.configure(command=self.show_drug_treatment)
 
         self.patient_drug_treatment_listbox = tk.Listbox(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_listbox.place(relx=0.016, rely=0.571
-                , relheight=0.351, relwidth=0.959, bordermode='ignore')
+                                                  , relheight=0.351, relwidth=0.959, bordermode='ignore')
         self.patient_drug_treatment_listbox.configure(background="white")
         self.patient_drug_treatment_listbox.configure(font="TkFixedFont")
         self.patient_drug_treatment_listbox.configure(selectbackground="#c4c4c4")
@@ -502,8 +660,8 @@ class Toplevel1:
 
         self.patient_drug_treament_patientssn_textbox = tk.Text(self.patient_drug_treatment_labelframe)
         self.patient_drug_treament_patientssn_textbox.place(relx=0.219
-                , rely=0.122, relheight=0.098, relwidth=0.166
-                , bordermode='ignore')
+                                                            , rely=0.122, relheight=0.098, relwidth=0.166
+                                                            , bordermode='ignore')
         self.patient_drug_treament_patientssn_textbox.configure(background="white")
         self.patient_drug_treament_patientssn_textbox.configure(font="TkTextFont")
         self.patient_drug_treament_patientssn_textbox.configure(selectbackground="#c4c4c4")
@@ -512,8 +670,8 @@ class Toplevel1:
 
         self.patient_drug_treatment_drug_name_textbox = tk.Text(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_drug_name_textbox.place(relx=0.641
-                , rely=0.122, relheight=0.098, relwidth=0.291
-                , bordermode='ignore')
+                                                            , rely=0.122, relheight=0.098, relwidth=0.291
+                                                            , bordermode='ignore')
         self.patient_drug_treatment_drug_name_textbox.configure(background="white")
         self.patient_drug_treatment_drug_name_textbox.configure(font="TkTextFont")
         self.patient_drug_treatment_drug_name_textbox.configure(selectbackground="#c4c4c4")
@@ -522,7 +680,7 @@ class Toplevel1:
 
         self.patient_drug_treatment_drugID_textbox = tk.Text(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_drugID_textbox.place(relx=0.641, rely=0.286
-                , relheight=0.098, relwidth=0.134, bordermode='ignore')
+                                                         , relheight=0.098, relwidth=0.134, bordermode='ignore')
         self.patient_drug_treatment_drugID_textbox.configure(background="white")
         self.patient_drug_treatment_drugID_textbox.configure(font="TkTextFont")
         self.patient_drug_treatment_drugID_textbox.configure(selectbackground="#c4c4c4")
@@ -531,8 +689,8 @@ class Toplevel1:
 
         self.patient_drug_treatment_diagnosisID_textbox = tk.Text(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_diagnosisID_textbox.place(relx=0.234
-                , rely=0.286, relheight=0.098, relwidth=0.134
-                , bordermode='ignore')
+                                                              , rely=0.286, relheight=0.098, relwidth=0.134
+                                                              , bordermode='ignore')
         self.patient_drug_treatment_diagnosisID_textbox.configure(background="white")
         self.patient_drug_treatment_diagnosisID_textbox.configure(font="TkTextFont")
         self.patient_drug_treatment_diagnosisID_textbox.configure(selectbackground="#c4c4c4")
@@ -541,26 +699,26 @@ class Toplevel1:
 
         self.patient_surgeries_labelframe = tk.LabelFrame(top)
         self.patient_surgeries_labelframe.place(relx=0.015, rely=0.631
-                , relheight=0.336, relwidth=0.466)
+                                                , relheight=0.336, relwidth=0.466)
         self.patient_surgeries_labelframe.configure(relief='groove')
         self.patient_surgeries_labelframe.configure(text='''Patient Surgeries''')
         self.patient_surgeries_labelframe.configure(width=640)
 
         self.patient_surgeries_surgery_name_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_surgery_name_label.place(relx=0.078, rely=0.245
-                , height=21, width=97, bordermode='ignore')
+                                                        , height=21, width=97, bordermode='ignore')
         self.patient_surgeries_surgery_name_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_surgery_name_label.configure(text='''Surgery Name''')
-
-        self.patient_surgeries_reason_label = tk.Label(self.patient_surgeries_labelframe)
-        self.patient_surgeries_reason_label.place(relx=0.469, rely=0.245
-                , height=21, width=52, bordermode='ignore')
-        self.patient_surgeries_reason_label.configure(activebackground="#f9f9f9")
-        self.patient_surgeries_reason_label.configure(text='''Reason''')
+        #
+        # self.patient_surgeries_reason_label = tk.Label(self.patient_surgeries_labelframe)
+        # self.patient_surgeries_reason_label.place(relx=0.469, rely=0.245
+        #                                           , height=21, width=52, bordermode='ignore')
+        # self.patient_surgeries_reason_label.configure(activebackground="#f9f9f9")
+        # self.patient_surgeries_reason_label.configure(text='''Reason''')
 
         self.Listbox2 = tk.Listbox(self.patient_surgeries_labelframe)
         self.Listbox2.place(relx=0.016, rely=0.571, relheight=0.351
-                , relwidth=0.959, bordermode='ignore')
+                            , relwidth=0.959, bordermode='ignore')
         self.Listbox2.configure(background="white")
         self.Listbox2.configure(font="TkFixedFont")
         self.Listbox2.configure(selectbackground="#c4c4c4")
@@ -568,37 +726,37 @@ class Toplevel1:
 
         self.patient_surgeries_patientssn_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_patientssn_label.place(relx=0.078, rely=0.122
-                , height=21, width=80, bordermode='ignore')
+                                                      , height=21, width=80, bordermode='ignore')
         self.patient_surgeries_patientssn_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_patientssn_label.configure(text='''Patient SSN''')
 
         self.patient_surgeries_surgeryID_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_surgeryID_label.place(relx=0.438, rely=0.122
-                , height=21, width=72, bordermode='ignore')
+                                                     , height=21, width=72, bordermode='ignore')
         self.patient_surgeries_surgeryID_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_surgeryID_label.configure(text='''Surgery ID''')
 
         self.patient_surgeries_result_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_result_label.place(relx=0.688, rely=0.449
-                , height=21, width=45, bordermode='ignore')
+                                                  , height=21, width=45, bordermode='ignore')
         self.patient_surgeries_result_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_result_label.configure(text='''Result''')
 
         self.patient_surgeries_end_date_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_end_date_label.place(relx=0.734, rely=0.286
-                , height=21, width=63, bordermode='ignore')
+                                                    , height=21, width=63, bordermode='ignore')
         self.patient_surgeries_end_date_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_end_date_label.configure(text='''End Date''')
 
         self.patient_surgeries_start_date_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_start_date_label.place(relx=0.734, rely=0.122
-                , height=21, width=70, bordermode='ignore')
+                                                      , height=21, width=70, bordermode='ignore')
         self.patient_surgeries_start_date_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_start_date_label.configure(text='''Start Date''')
 
         self.patient_surgeries_patient_ssn_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_patient_ssn_textbox.place(relx=0.219, rely=0.122
-                , relheight=0.098, relwidth=0.166, bordermode='ignore')
+                                                         , relheight=0.098, relwidth=0.166, bordermode='ignore')
         self.patient_surgeries_patient_ssn_textbox.configure(background="white")
         self.patient_surgeries_patient_ssn_textbox.configure(font="TkTextFont")
         self.patient_surgeries_patient_ssn_textbox.configure(selectbackground="#c4c4c4")
@@ -607,7 +765,7 @@ class Toplevel1:
 
         self.patient_surgeries_end_date_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_end_date_textbox.place(relx=0.844, rely=0.286
-                , relheight=0.098, relwidth=0.134, bordermode='ignore')
+                                                      , relheight=0.098, relwidth=0.134, bordermode='ignore')
         self.patient_surgeries_end_date_textbox.configure(background="white")
         self.patient_surgeries_end_date_textbox.configure(font="TkTextFont")
         self.patient_surgeries_end_date_textbox.configure(selectbackground="#c4c4c4")
@@ -616,7 +774,7 @@ class Toplevel1:
 
         self.patient_surgeries_start_date_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_start_date_textbox.place(relx=0.844, rely=0.122
-                , relheight=0.098, relwidth=0.134, bordermode='ignore')
+                                                        , relheight=0.098, relwidth=0.134, bordermode='ignore')
         self.patient_surgeries_start_date_textbox.configure(background="white")
         self.patient_surgeries_start_date_textbox.configure(font="TkTextFont")
         self.patient_surgeries_start_date_textbox.configure(selectbackground="#c4c4c4")
@@ -625,7 +783,7 @@ class Toplevel1:
 
         self.patient_surgeries_surgeryID_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_surgeryID_textbox.place(relx=0.563, rely=0.122
-                , relheight=0.098, relwidth=0.103, bordermode='ignore')
+                                                       , relheight=0.098, relwidth=0.103, bordermode='ignore')
         self.patient_surgeries_surgeryID_textbox.configure(background="white")
         self.patient_surgeries_surgeryID_textbox.configure(font="TkTextFont")
         self.patient_surgeries_surgeryID_textbox.configure(selectbackground="#c4c4c4")
@@ -634,7 +792,7 @@ class Toplevel1:
 
         self.patient_surgeries_surgery_name_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_surgery_name_textbox.place(relx=0.25, rely=0.245
-                , relheight=0.098, relwidth=0.166, bordermode='ignore')
+                                                          , relheight=0.098, relwidth=0.166, bordermode='ignore')
         self.patient_surgeries_surgery_name_textbox.configure(background="white")
         self.patient_surgeries_surgery_name_textbox.configure(font="TkTextFont")
         self.patient_surgeries_surgery_name_textbox.configure(selectbackground="#c4c4c4")
@@ -643,70 +801,73 @@ class Toplevel1:
 
         self.patient_surgeries_result_textbox = tk.Text(self.patient_surgeries_labelframe)
         self.patient_surgeries_result_textbox.place(relx=0.766, rely=0.449
-                , relheight=0.098, relwidth=0.213, bordermode='ignore')
+                                                    , relheight=0.098, relwidth=0.213, bordermode='ignore')
         self.patient_surgeries_result_textbox.configure(background="white")
         self.patient_surgeries_result_textbox.configure(font="TkTextFont")
         self.patient_surgeries_result_textbox.configure(selectbackground="#c4c4c4")
         self.patient_surgeries_result_textbox.configure(width=136)
         self.patient_surgeries_result_textbox.configure(wrap='word')
 
-        self.patient_surgeries_reason_textbox = tk.Text(self.patient_surgeries_labelframe)
-        self.patient_surgeries_reason_textbox.place(relx=0.563, rely=0.245
-                , relheight=0.098, relwidth=0.15, bordermode='ignore')
-        self.patient_surgeries_reason_textbox.configure(background="white")
-        self.patient_surgeries_reason_textbox.configure(font="TkTextFont")
-        self.patient_surgeries_reason_textbox.configure(selectbackground="#c4c4c4")
-        self.patient_surgeries_reason_textbox.configure(width=96)
-        self.patient_surgeries_reason_textbox.configure(wrap='word')
+        # self.patient_surgeries_reason_textbox = tk.Text(self.patient_surgeries_labelframe)
+        # self.patient_surgeries_reason_textbox.place(relx=0.563, rely=0.245
+        #                                             , relheight=0.098, relwidth=0.15, bordermode='ignore')
+        # self.patient_surgeries_reason_textbox.configure(background="white")
+        # self.patient_surgeries_reason_textbox.configure(font="TkTextFont")
+        # self.patient_surgeries_reason_textbox.configure(selectbackground="#c4c4c4")
+        # self.patient_surgeries_reason_textbox.configure(width=96)
+        # self.patient_surgeries_reason_textbox.configure(wrap='word')
 
         self.patient_surgeries_yyyymmdd_startdate_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_yyyymmdd_startdate_label.place(relx=0.859
-                , rely=0.082, height=11, width=56, bordermode='ignore')
+                                                              , rely=0.082, height=11, width=56, bordermode='ignore')
         self.patient_surgeries_yyyymmdd_startdate_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_yyyymmdd_startdate_label.configure(font=font9)
         self.patient_surgeries_yyyymmdd_startdate_label.configure(text='''YYYYMMDD''')
 
         self.patient_surgeries_yyyymmdd_enddate_label = tk.Label(self.patient_surgeries_labelframe)
         self.patient_surgeries_yyyymmdd_enddate_label.place(relx=0.859
-                , rely=0.245, height=11, width=56, bordermode='ignore')
+                                                            , rely=0.245, height=11, width=56, bordermode='ignore')
         self.patient_surgeries_yyyymmdd_enddate_label.configure(activebackground="#f9f9f9")
         self.patient_surgeries_yyyymmdd_enddate_label.configure(font=font9)
         self.patient_surgeries_yyyymmdd_enddate_label.configure(text='''YYYYMMDD''')
 
         self.patient_surgeries_show_surgeries_button = tk.Button(self.patient_surgeries_labelframe)
         self.patient_surgeries_show_surgeries_button.place(relx=0.016, rely=0.408
-                , height=29, width=126, bordermode='ignore')
+                                                           , height=29, width=126, bordermode='ignore')
         self.patient_surgeries_show_surgeries_button.configure(activebackground="#d9d9d9")
         self.patient_surgeries_show_surgeries_button.configure(text='''Show Surgeries''')
+        self.patient_surgeries_show_surgeries_button.configure(command=self.show_surgery)
 
         self.patient_surgeries_update_button = tk.Button(self.patient_surgeries_labelframe)
         self.patient_surgeries_update_button.place(relx=0.25, rely=0.408
-                , height=29, width=113, bordermode='ignore')
+                                                   , height=29, width=113, bordermode='ignore')
         self.patient_surgeries_update_button.configure(activebackground="#d9d9d9")
         self.patient_surgeries_update_button.configure(text='''Update''')
+        self.patient_surgeries_update_button.configure(command=self.update_surgery)
 
         self.patient_surgeries_submit_button = tk.Button(self.patient_surgeries_labelframe)
         self.patient_surgeries_submit_button.place(relx=0.469, rely=0.408
-                , height=29, width=119, bordermode='ignore')
+                                                   , height=29, width=119, bordermode='ignore')
         self.patient_surgeries_submit_button.configure(activebackground="#d9d9d9")
         self.patient_surgeries_submit_button.configure(text='''Submit''')
+        self.patient_surgeries_submit_button.configure(command=self.insert_patient_surgery)
 
         self.patient_info_labelframe = tk.LabelFrame(top)
         self.patient_info_labelframe.place(relx=0.015, rely=0.027
-                , relheight=0.254, relwidth=0.466)
+                                           , relheight=0.254, relwidth=0.466)
         self.patient_info_labelframe.configure(relief='groove')
         self.patient_info_labelframe.configure(text='''Patient Information''')
         self.patient_info_labelframe.configure(width=640)
 
         self.patient_information_patient_ssn_label = tk.Label(self.patient_info_labelframe)
         self.patient_information_patient_ssn_label.place(relx=0.016, rely=0.108
-                , height=21, width=80, bordermode='ignore')
+                                                         , height=21, width=80, bordermode='ignore')
         self.patient_information_patient_ssn_label.configure(activebackground="#f9f9f9")
         self.patient_information_patient_ssn_label.configure(text='''Patient SSN''')
 
         self.patient_information_patientssn_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_information_patientssn_textbox.place(relx=0.141, rely=0.108
-                , relheight=0.13, relwidth=0.166, bordermode='ignore')
+                                                          , relheight=0.13, relwidth=0.166, bordermode='ignore')
         self.patient_information_patientssn_textbox.configure(background="white")
         self.patient_information_patientssn_textbox.configure(font="TkTextFont")
         self.patient_information_patientssn_textbox.configure(selectbackground="#c4c4c4")
@@ -715,7 +876,7 @@ class Toplevel1:
 
         self.Listbox3 = tk.Listbox(self.patient_info_labelframe)
         self.Listbox3.place(relx=0.016, rely=0.595, relheight=0.303
-                , relwidth=0.959, bordermode='ignore')
+                            , relwidth=0.959, bordermode='ignore')
         self.Listbox3.configure(background="white")
         self.Listbox3.configure(font="TkFixedFont")
         self.Listbox3.configure(selectbackground="#c4c4c4")
@@ -723,13 +884,13 @@ class Toplevel1:
 
         self.patient_info_fullname_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_fullname_label.place(relx=0.328, rely=0.108, height=21
-                , width=71, bordermode='ignore')
+                                               , width=71, bordermode='ignore')
         self.patient_info_fullname_label.configure(activebackground="#f9f9f9")
         self.patient_info_fullname_label.configure(text='''Full Name''')
 
         self.patient_info_fullname_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_info_fullname_textbox.place(relx=0.438, rely=0.108
-                , relheight=0.13, relwidth=0.213, bordermode='ignore')
+                                                 , relheight=0.13, relwidth=0.213, bordermode='ignore')
         self.patient_info_fullname_textbox.configure(background="white")
         self.patient_info_fullname_textbox.configure(font="TkTextFont")
         self.patient_info_fullname_textbox.configure(selectbackground="#c4c4c4")
@@ -738,13 +899,13 @@ class Toplevel1:
 
         self.patient_info_DOB_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_DOB_label.place(relx=0.672, rely=0.108, height=21
-                , width=33, bordermode='ignore')
+                                          , width=33, bordermode='ignore')
         self.patient_info_DOB_label.configure(activebackground="#f9f9f9")
         self.patient_info_DOB_label.configure(text='''DOB''')
 
         self.patient_info_DOB_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_info_DOB_textbox.place(relx=0.734, rely=0.108
-                , relheight=0.13, relwidth=0.134, bordermode='ignore')
+                                            , relheight=0.13, relwidth=0.134, bordermode='ignore')
         self.patient_info_DOB_textbox.configure(background="white")
         self.patient_info_DOB_textbox.configure(font="TkTextFont")
         self.patient_info_DOB_textbox.configure(selectbackground="#c4c4c4")
@@ -753,20 +914,20 @@ class Toplevel1:
 
         self.patient_info_yyyymmdd_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_yyyymmdd_label.place(relx=0.734, rely=0.054, height=11
-                , width=61, bordermode='ignore')
+                                               , width=61, bordermode='ignore')
         self.patient_info_yyyymmdd_label.configure(activebackground="#f9f9f9")
         self.patient_info_yyyymmdd_label.configure(font=font9)
         self.patient_info_yyyymmdd_label.configure(text='''YYYYMMDD''')
 
         self.patient_info_address_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_address_label.place(relx=0.016, rely=0.27, height=21
-                , width=56, bordermode='ignore')
+                                              , width=56, bordermode='ignore')
         self.patient_info_address_label.configure(activebackground="#f9f9f9")
         self.patient_info_address_label.configure(text='''Address''')
 
         self.patient_info_address_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_info_address_textbox.place(relx=0.109, rely=0.27
-                , relheight=0.13, relwidth=0.259, bordermode='ignore')
+                                                , relheight=0.13, relwidth=0.259, bordermode='ignore')
         self.patient_info_address_textbox.configure(background="white")
         self.patient_info_address_textbox.configure(font="TkTextFont")
         self.patient_info_address_textbox.configure(selectbackground="#c4c4c4")
@@ -775,13 +936,13 @@ class Toplevel1:
 
         self.patient_info_gender_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_gender_label.place(relx=0.375, rely=0.27, height=21
-                , width=61, bordermode='ignore')
+                                             , width=61, bordermode='ignore')
         self.patient_info_gender_label.configure(activebackground="#f9f9f9")
         self.patient_info_gender_label.configure(text='''Gender''')
 
         self.patient_info_gender_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_info_gender_textbox.place(relx=0.484, rely=0.27
-                , relheight=0.13, relwidth=0.088, bordermode='ignore')
+                                               , relheight=0.13, relwidth=0.088, bordermode='ignore')
         self.patient_info_gender_textbox.configure(background="white")
         self.patient_info_gender_textbox.configure(font="TkTextFont")
         self.patient_info_gender_textbox.configure(selectbackground="#c4c4c4")
@@ -790,13 +951,13 @@ class Toplevel1:
 
         self.patient_info_phone_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_phone_label.place(relx=0.609, rely=0.27, height=21
-                , width=59, bordermode='ignore')
+                                            , width=59, bordermode='ignore')
         self.patient_info_phone_label.configure(activebackground="#f9f9f9")
         self.patient_info_phone_label.configure(text='''Phone #''')
 
         self.Text5 = tk.Text(self.patient_info_labelframe)
         self.Text5.place(relx=0.703, rely=0.27, relheight=0.13, relwidth=0.181
-                , bordermode='ignore')
+                         , bordermode='ignore')
         self.Text5.configure(background="white")
         self.Text5.configure(font="TkTextFont")
         self.Text5.configure(selectbackground="#c4c4c4")
@@ -805,14 +966,14 @@ class Toplevel1:
 
         self.patient_info_emergency_contact_phone_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_emergency_contact_phone_label.place(relx=0.016
-                , rely=0.432, height=21, width=190, bordermode='ignore')
+                                                              , rely=0.432, height=21, width=190, bordermode='ignore')
         self.patient_info_emergency_contact_phone_label.configure(activebackground="#f9f9f9")
         self.patient_info_emergency_contact_phone_label.configure(text='''Emergency Contact Phone #''')
 
         self.patient_info_emergency_contact_phone_textbox = tk.Text(self.patient_info_labelframe)
         self.patient_info_emergency_contact_phone_textbox.place(relx=0.313
-                , rely=0.432, relheight=0.13, relwidth=0.213
-                , bordermode='ignore')
+                                                                , rely=0.432, relheight=0.13, relwidth=0.213
+                                                                , bordermode='ignore')
         self.patient_info_emergency_contact_phone_textbox.configure(background="white")
         self.patient_info_emergency_contact_phone_textbox.configure(font="TkTextFont")
         self.patient_info_emergency_contact_phone_textbox.configure(selectbackground="#c4c4c4")
@@ -821,16 +982,19 @@ class Toplevel1:
 
         self.patient_info_show_button = tk.Button(self.patient_info_labelframe)
         self.patient_info_show_button.place(relx=0.563, rely=0.432, height=29
-                , width=141, bordermode='ignore')
+                                            , width=141, bordermode='ignore')
         self.patient_info_show_button.configure(activebackground="#d9d9d9")
         self.patient_info_show_button.configure(text='''Show Information''')
+        self.patient_info_show_button.configure(command=self.show_patient_info)
 
         self.patient_info_update_button = tk.Button(self.patient_info_labelframe)
         self.patient_info_update_button.place(relx=0.813, rely=0.432, height=29
-                , width=103, bordermode='ignore')
+                                              , width=103, bordermode='ignore')
         self.patient_info_update_button.configure(activebackground="#d9d9d9")
         self.patient_info_update_button.configure(text='''Update''')
         self.patient_info_update_button.configure(width=103)
+        self.patient_info_update_button.configure(command=self.update_patient_info)
+
 
 if __name__ == '__main__':
     vp_start_gui()
