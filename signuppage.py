@@ -57,23 +57,6 @@ def destroy_Toplevel1():
 class Toplevel1:
     def add_Patient(self):
 
-<<<<<<< HEAD
-        first_name = self.FirstNameText.get('1.0','end')
-        last_name = self.LastNameText.get('1.0', 'end')
-        dob = self.DOBText.get('1.0', 'end')
-        full_address = self.AddressText.get('1.0', 'end')
-        phone_number = self.PhoneNumberText.get('1.0', 'end')
-        e_contact_fn = self.EmergencyFirstNameText.get('1.0', 'end')
-        e_contact_ln = self.EmergencyContactLastNameText.get('1.0', 'end')
-        e_contact_num = self.EmergencyContactNumberText.get('1.0', 'end')
-
-        
-        sql_insert = "INSERT INTO patient (firstname, lastname, dateofbirth, fulladdress, phonenumber,  emergencycontactfirstname, emergencycontactlastname,emergencycontactnumber) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
-        patient_info = (first_name, last_name, dob, full_address, phone_number, e_contact_fn, e_contact_ln, e_contact_num)
-        self.my_cursor.execute(sql_insert, patient_info)
-        self.my_db.commit()
-
-=======
         patient_ssn = self.SSNText.get('1.0', 'end-1c')
         patient_name = self.FullNameText.get('1.0', 'end-1c')
         dob = self.DOBText.get('1.0', 'end-1c')
@@ -83,9 +66,9 @@ class Toplevel1:
         e_contact_num = self.EmergencyContactNumberText.get('1.0', 'end-1c')
         gender = self.GenderText.get('1.0', 'end-1c')
 
-        insert_patient = "INSERT INTO patient (socialsecuritynumber, fullname, gender, dateofbirth, address, phonenumber, emergencycontactnumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        insert_patient = "INSERT INTO patient (SSN, fullName, gender, dateOfBirth, address, phoneNumber, emergencyContactNumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
         patient_info = (patient_ssn, patient_name, gender, dob, full_address, phone_number, e_contact_num)
-        insert_emergency_contact = "INSERT INTO emergencycontact (socialsecuritynumber, fullname, phonenumber) VALUES (%s,%s,%s)"
+        insert_emergency_contact = "INSERT INTO emergencycontact (SSN, fullName, phoneNumber) VALUES (%s,%s,%s)"
         emergency_contact_info = (patient_ssn, emergency_name, e_contact_num)
         try:
             self.my_cursor.execute(insert_patient, patient_info)
@@ -94,14 +77,13 @@ class Toplevel1:
             self.my_db.commit()
         except Exception:
             messagebox.showerror('Error', 'Error entering patient info: please double check patient information')
->>>>>>> f28e04ad9d9082445673c9c02146076d57390431
 
     def __init__(self, top=None):
         try:
             self.my_db = mysql.connector.connect(
                 host="localhost",
-                user="saddique", #root
-                password="password", #csc336
+                user="root",
+                password="csc336",
                 database="hospital")
 
             self.my_cursor = self.my_db.cursor()
