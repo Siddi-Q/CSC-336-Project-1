@@ -21,7 +21,7 @@ Significant Project Files:
 
   Path: CSC-336-Project-1\Databases Project 1\signinpage\signuppage.py
   
-  Description: Contains a Desktop GUI that a patient will use to signin.
+  Description: This file will open a Desktop GUI that a patient will use to signin.
   
   Necesary Program Changes needed to be made by programmer:
 
@@ -35,9 +35,9 @@ Constraints: Need to input values into all textboxes.
 
 * admin_doctor_window.py
 
-  Path: CSC-336-Project-1\Databases Project 1\
+  Path: CSC-336-Project-1\Databases Project 1\admin-doctor-window\admin_doctor_window.py
   
-  Description: 
+  Description: This file will open a Desktop GUI that an admin/hospital persoanel can use to show, add and update patient information.
   
   Necesary Program Changes needed to be made by programmer:
 
@@ -45,9 +45,9 @@ Constraints: Need to input values into all textboxes.
 
 Function Name: def show_contact_info(self)
 
-Descriptions: 
+Descriptions: This function will be executed once the Show Contact Information button, which is in the Emergency Contact Information frame, is pressed. This will list a pateints SSN and fullName. Aswell as the patients emergency contacts fullName and phoneNumber.
 
-Constraints:
+Constraints: Need to input a SSN in the patient SSN text box. To get a result that persons SSN must exist in the patient table and emergencycontact table
 
 Function Name: def show_diagnosis(self)
 
