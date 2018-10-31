@@ -57,23 +57,6 @@ def destroy_Toplevel1():
 class Toplevel1:
     def add_Patient(self):
 
-<<<<<<< HEAD
-        first_name = self.FirstNameText.get('1.0','end')
-        last_name = self.LastNameText.get('1.0', 'end')
-        dob = self.DOBText.get('1.0', 'end')
-        full_address = self.AddressText.get('1.0', 'end')
-        phone_number = self.PhoneNumberText.get('1.0', 'end')
-        e_contact_fn = self.EmergencyFirstNameText.get('1.0', 'end')
-        e_contact_ln = self.EmergencyContactLastNameText.get('1.0', 'end')
-        e_contact_num = self.EmergencyContactNumberText.get('1.0', 'end')
-
-        
-        sql_insert = "INSERT INTO patient (firstname, lastname, dateofbirth, fulladdress, phonenumber,  emergencycontactfirstname, emergencycontactlastname,emergencycontactnumber) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
-        patient_info = (first_name, last_name, dob, full_address, phone_number, e_contact_fn, e_contact_ln, e_contact_num)
-        self.my_cursor.execute(sql_insert, patient_info)
-        self.my_db.commit()
-
-=======
         patient_ssn = self.SSNText.get('1.0', 'end-1c')
         patient_name = self.FullNameText.get('1.0', 'end-1c')
         dob = self.DOBText.get('1.0', 'end-1c')
@@ -94,7 +77,6 @@ class Toplevel1:
             self.my_db.commit()
         except Exception:
             messagebox.showerror('Error', 'Error entering patient info: please double check patient information')
->>>>>>> f28e04ad9d9082445673c9c02146076d57390431
 
     def __init__(self, top=None):
         try:
