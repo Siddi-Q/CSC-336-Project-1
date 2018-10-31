@@ -10,7 +10,7 @@ mysql = MySQL()
 
 app.config['MYSQL_DATABASE_USER'] = 'saddique'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-app.config['MYSQL_DATABASE_DB'] = 'mydb'
+app.config['MYSQL_DATABASE_DB'] = 'hospital'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
 mysql.init_app(app)
@@ -33,9 +33,12 @@ def signin():
     if form.validate_on_submit():
         flash(f'{form.fullname.data} has been signed in!', 'success')
         cursor = connect.cursor()
-        cursor.execute(''' INSERT INTO patient_info VALUES (%s, %s, %s, %s, %s, %s)''',
-                (form.fullname.data, form.gender.data, form.date_of_birth.data,
+        cursor.execute(''' INSERT INTO patient VALUES (%s, %s, %s, %s, %s, %s, %s)''',
+                (form.ssn.data, form.fullname.data, form.gender.data, form.date_of_birth.data,
                 form.address.data, form.phone_number.data, form.emergency_contact_number.data))
+        connect.commit()
+        cursor.execute(''' INSERT INTO emergencycontact VALUES(%s, %s, %s)''',
+                (form.ssn.data, form.emergency_contact_name.data, form.emergency_contact_number.data))
         connect.commit()
         return redirect(url_for('hello'))
     return render_template('signin.html', form = form)

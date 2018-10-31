@@ -22,6 +22,21 @@
         </div>
 
         <div class = "form-group">
+          {{ form.ssn.label(class = "form-control-label") }}
+
+          {% if form.ssn.errors %}
+            {{ form.ssn(class = "form-control form-control-lg is-invalid") }}
+            <div class = "invalid-feedback">
+              {% for error in form.ssn.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.ssn(class = "form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <div class = "form-group">
           {{ form.gender.label(class = "form-control-label") }}
 
           {% if form.gender.errors %}
@@ -78,6 +93,21 @@
             </div>
           {% else %}
             {{ form.phone_number(class = "form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <div class = "form-group">
+          {{ form.emergency_contact_name.label(class = "form-control-label") }}
+
+          {% if form.emergency_contact_name.errors %}
+            {{ form.emergency_contact_name(class = "form-control form-control-lg is-invalid") }}
+            <div class = "invalid-feedback">
+              {% for error in form.emergency_contact_name.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.emergency_contact_name(class = "form-control form-control-lg") }}
           {% endif %}
         </div>
 

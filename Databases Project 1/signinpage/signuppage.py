@@ -76,8 +76,8 @@ class Toplevel1:
         try:
             self.my_db = mysql.connector.connect(
                 host="localhost",
-                user="root",
-                password="csc336",
+                user="saddique", #root
+                password="password", #csc336
                 database="hospital")
 
             self.my_cursor = self.my_db.cursor()

@@ -74,8 +74,9 @@ class Toplevel1:
 
     def show_diagnosis(self):
         try:
+            patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
             show_contact_info_command = f"SELECT p.SSN, p.fullName, pd.diagnosisID, pd.diagnosisName, pd.dateOfDiagnosis " \
-                                        f"FROM patient p JOIN patientdiagnosis pd ON p.SSN = pd.SSN "
+                                        f"FROM patient p JOIN patientdiagnosis pd ON p.SSN = pd.SSN AND pd.SSN = '{patient_ssn}' "
             self.my_cursor.execute(show_contact_info_command)
             list_diagnosis = self.my_cursor.fetchall()
             i = 0
@@ -120,9 +121,9 @@ class Toplevel1:
 
     def show_drug_treatment(self):
         try:
-            #self.my_cursor.execute("SELECT * FROM patientdrugtreatment")
+            patient_ssn = self.patient_drug_treament_patientssn_textbox.get('1.0', 'end-1c')
             show_contact_info_command = f"SELECT p.SSN, p.fullName, pdt.diagnosisID, pdt.drugId, pdt.drugName " \
-                                        f"FROM patient p JOIN patientdrugtreatment pdt ON p.SSN = pdt.SSN "
+                                        f"FROM patient p JOIN patientdrugtreatment pdt ON p.SSN = pdt.SSN AND pdt.SSN = '{patient_ssn}' "
             self.my_cursor.execute(show_contact_info_command)
             list_drug_treatment = self.my_cursor.fetchall()
             i = 0
@@ -251,9 +252,9 @@ class Toplevel1:
         patient_fees = self.patient_records_fee_textbox.get('1.0', 'end-1c')
 
         update_command = f"UPDATE patientrecord SET" \
-                         f" admissionDate = {patient_admission}, " \
-                         f"releaseDate = {patient_release}," \
-                         f" fees = {patient_fees} WHERE SSN = {patient_ssn} AND admissionDate = {patient_admission}"
+                         f" admissionDate = '{patient_admission}', " \
+                         f"releaseDate = '{patient_release}'," \
+                         f" fees = '{patient_fees}' WHERE SSN = '{patient_ssn}' AND admissionDate = '{patient_admission}'"
         try:
             self.my_cursor.execute(update_command)
             self.my_db.commit()
@@ -321,8 +322,8 @@ class Toplevel1:
         try:
             self.my_db = mysql.connector.connect(
                 host="localhost",
-                user="root",
-                password="csc336",
+                user="saddique", #root
+                password="password", #csc336
                 database="hospital")
 
             self.my_cursor = self.my_db.cursor()
