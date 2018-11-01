@@ -87,51 +87,51 @@ Constraints:
 
 Function Name: def show_patient_info(self)
 
-Descriptions: 
+Descriptions: Descriptions: Takes patient SSN and displays full name, gender, dat of birth, address, phone number, and emergency contact phone number (all of which are in the 'patient' table)
 
-Constraints:
+Constraints: User needs to enter a valid social security number
 
 Function Name: def update_patient_info(self)
 
-Descriptions: 
+Descriptions: Takes input from user (patient name, gender, dob, address, phone number, and emergency phone number) stores each value into its own variable, and updates the patient whose ssn matches the one input by user in the patient table. Furthermore, emergency contact number is updated in the emergency contact table
 
-Constraints:
+Constraints: All fields in the patient info frame must be filled out to successfully update a patients information
 
 Function Name: def insert_patient_records(self)
 
-Descriptions: 
+Descriptions: Takes input from user (as update_patient does) and inserts these values as a new member of the patient table, with the exception of emergency contact
 
-Constraints:
+Constraints: Must fill all values to create a new patient
 
 Function Name: def show_patient_records(self)
 
-Descriptions: 
+Descriptions: Takes patient SSN and displays full name, admission date, release date, and hospital fees 
 
-Constraints:
+Constraints: User needs to enter a valid social security number
 
 Function Name: def update_patient_records(self)
 
-Descriptions: 
+Descriptions: Takes input from user (patient full name, admission date, release date, and hospital fees) stores each value into its own variable, and updates the patient whose ssn matches the one input by user in the patient records table.
 
-Constraints:
+Constraints: All fields in the patient records frame must be filled out to successfully update a patients information
 
 Function Name: def insert_patient_surgery(self)
 
-Descriptions: 
+Descriptions: Takes patients ssn, a unique surgery id, surgery name, surgery start date, end date, & results and adds it to the patient surgeries table 
 
-Constraints:
+Constraints: All fields in patient surgery frame must be filled out to insert a new patient into patient surgeries table
 
 Function Name: def show_surgery(self)
 
-Descriptions: 
+Descriptions: Takes patient SSN, and displays full name, surgery id, surgery name, begin date, end date, and results from the patient surgeries table 
 
-Constraints:
+Constraints: Requires patient ssn 
 
 Function Name: def update_surgery(self)
 
-Descriptions: 
+Descriptions: takes input from user (patient ssn, surgery id, surgery name, begin date, end date, and results) and makes changes to the inputted attributes (besides ssn), if there are any to be made
 
-Constraints:
+Constraints: Required all fields in the patient surgery frame to be filled out
 
 * app.py
 
